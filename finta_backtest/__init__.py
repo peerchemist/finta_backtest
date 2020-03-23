@@ -1,0 +1,1 @@
+from finta_backtest.main import Strategy, Backtest
