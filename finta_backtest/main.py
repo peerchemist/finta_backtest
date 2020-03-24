@@ -83,7 +83,7 @@ class Backtest(TA):
                 "balance",
                 "stock",
             ]
-        ).fillna(0)
+        )
         #  fill relevant cells
         self.ledger["signal"] = self.strategy.signal()
         self.ledger.at[self.ledger.index[0], "balance"] = self.balance
@@ -95,6 +95,12 @@ class Backtest(TA):
         close = entry * self.ledger["close"][-1]
 
         return close
+
+    def _update_ledger(self, index):
+        """keep the internal ledger updated"""
+
+        self.ledger.loc[index, "balance"] = self.balance
+        self.ledger.loc[index, "stock"] = self.stock
 
     def _trade(self, row):
         """do the deed"""
@@ -111,23 +117,31 @@ class Backtest(TA):
             #  going long
             if last_trade["action"] != "long" and row["signal"]:
                 self._long(row["close"], timestamp)
+                self._update_ledger(row.name)
 
             # covering long (booking profit)
             if last_trade["action"] is "long" and not row["signal"]:
                 self._cover_long(row["close"], timestamp, last_trade)
+                self._update_ledger(row.name)
 
             # if shorts are allowed
             if not self.only_long:
                 # going short
                 if last_trade["action"] != "short" and not row["signal"]:
                     self._short(row["close"], timestamp)
+                    self._update_ledger(row.name)
 
                 # covering short (booking profit)
                 if last_trade["action"] is "short" and row["signal"]:
                     self._cover_short(row["close"], timestamp, last_trade)
+                    self._update_ledger(row.name)
 
         else:  # the very first trade
-            self._long(row["close"], timestamp)
+            if row.signal:
+                self._long(row["close"], timestamp)
+                self._update_ledger(row.name)
+            else:
+                pass
 
     def _commission_calc(self, number: float) -> float:
         """factor in trade commission"""
