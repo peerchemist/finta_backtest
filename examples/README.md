@@ -1,6 +1,6 @@
 ## How to write a strategy
 
-Strategy is defined as a `class`, which inherits `Strategy` metaclass.
+Strategy is defined as a Python `class`, which inherits `Strategy` metaclass.
 For this reason, you need to import `Strategy` first.
 
 > from finta_backtest import Strategy
@@ -22,7 +22,7 @@ The rest of parameters are optional and depend on the indicator you plan to use.
 
 Name of the strategy, do as you like.
 
-### signal
+### def signal
 
 The most important method, this is where magic happens.
 `signal` method must return pandas Series with index matching the `ohlc` and boolean (True/False) values.
@@ -64,3 +64,7 @@ class EMACross(Strategy):
 
         return signal
 ```
+
+Note:
+
+Type hints I use in the example above (`None, int, pd.Series`) are optional.
