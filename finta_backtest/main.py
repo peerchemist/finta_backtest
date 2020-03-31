@@ -2,6 +2,7 @@ from pandas import DataFrame
 from abc import ABCMeta, abstractmethod
 from typing import List, Any
 from finta import TA
+from finta.utils import resample
 
 
 class Strategy(metaclass=ABCMeta):
@@ -14,19 +15,12 @@ class Strategy(metaclass=ABCMeta):
         """strategy name"""
         self.name
 
-    def resample(self, interval: str) -> DataFrame:
-        """resample column by <interval>"""
+    @staticmethod
+    def resample(ohlc: DataFrame, interval: str) -> DataFrame:
+        """resample by <interval>"""
 
-        d = {
-            "open": "first",
-            "high": "max",
-            "low": "min",
-            "close": "last",
-            "volume": "sum",
-        }
-
-        return self.ohlc.resample(interval).agg(d)
         return resample(ohlc, interval)
+
     @abstractmethod
     def signal(self) -> DataFrame:
         """What is the buy signal?"""
