@@ -22,8 +22,15 @@ class Strategy(metaclass=ABCMeta):
         return resample(ohlc, interval)
 
     @abstractmethod
-    def signal(self) -> DataFrame:
+    def buy_signal(self) -> DataFrame:
         """What is the buy signal?"""
+        pass
+
+    @abstractmethod
+    def sell_signal(self) -> DataFrame:
+        """What is the sell signal?
+        You can just set it to reverse of the sell_signal."""
+        # return -self.buy_signal()
         pass
 
     def candle_close(self) -> DataFrame:
@@ -61,7 +68,7 @@ class Backtest(TA):
         # self.commission = commission
         #  list of simulated trades
         self.trades: List = []
-        #  inventory
+        #  inventorya
         self.stock: float = 0
         #  cash on hand
         self.balance: float = deposit
@@ -73,13 +80,15 @@ class Backtest(TA):
                 "low",
                 "open",
                 "volume",
-                "signal",
+                "buy_signal",
+                "sell_signal",
                 "balance",
                 "stock",
             ]
         )
         #  fill relevant cells
-        self.ledger["signal"] = self.strategy.signal()
+        self.ledger["buy_signal"] = self.strategy.buy_signal()
+        self.ledger["sell_signal"] = self.strategy.sell_signal()
         self.ledger.at[self.ledger.index[0], "balance"] = self.balance
 
     def _hodl(self) -> float:
@@ -109,29 +118,29 @@ class Backtest(TA):
 
         if last_trade:
             #  going long
-            if last_trade["action"] != "long" and row["signal"]:
+            if last_trade["action"] != "long" and row["buy_signal"]:
                 self._long(row["close"], timestamp)
                 self._update_ledger(row.name)
 
             # covering long (booking profit)
-            if last_trade["action"] is "long" and not row["signal"]:
+            if last_trade["action"] is "long" and not row["buy_signal"]:
                 self._cover_long(row["close"], timestamp, last_trade)
                 self._update_ledger(row.name)
 
             # if shorts are allowed
             if not self.only_long:
                 # going short
-                if last_trade["action"] != "short" and not row["signal"]:
+                if last_trade["action"] != "short" and not row["sell_signal"]:
                     self._short(row["close"], timestamp)
                     self._update_ledger(row.name)
 
                 # covering short (booking profit)
-                if last_trade["action"] is "short" and row["signal"]:
+                if last_trade["action"] is "short" and row["sell_signal"]:
                     self._cover_short(row["close"], timestamp, last_trade)
                     self._update_ledger(row.name)
 
         else:  # the very first trade
-            if row.signal:
+            if row.buy_signal:
                 self._long(row["close"], timestamp)
                 self._update_ledger(row.name)
             else:
