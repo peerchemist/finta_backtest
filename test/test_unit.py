@@ -33,12 +33,16 @@ class TRIXCross(Strategy):
     def name(self):
         return f"TrixCross ({self.period_slow})"
 
-    def signal(self):
+    def buy_signal(self):
 
         trix = TA.TRIX(self.ohlc, self.period)
         signal = trix > 0
 
         return signal
+
+    def sell_signal(self):
+
+        return -self.buy_signal()
 
 
 trixcross = TRIXCross(ohlc, 2)
@@ -48,3 +52,5 @@ bt = Backtest(trixcross, deposit=1000, only_long=True)
 assert isinstance(bt, Backtest)
 
 report = bt.run()
+assert isinstance(report, dict)
+
