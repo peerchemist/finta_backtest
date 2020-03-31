@@ -20,7 +20,11 @@ class EvMacd(Strategy):
     def name(self):
         return f"EVMACD({self.period, self.slow_period})"
 
-    def signal(self):
+    def buy_signal(self):
 
         macd = TA.EV_MACD(self.ohlc, self.period, self.slow_period, self.signal_period)
         return macd["MACD"] > macd["SIGNAL"]
+
+    def sell_signal(self):
+
+        return -self.buy_signal()

@@ -16,8 +16,12 @@ class CloseUnderDEMA(Strategy):
     def name(self):
         return f"CloseUnderDEMA({self.period})"
 
-    def signal(self):
+    def buy_signal(self):
 
         dema = TA.DEMA(self.ohlc, 20)
 
-        return self.ohlc["close"] < dema
+        return self.ohlc["close"] > dema
+
+    def sell_signal(self):
+
+        return -self.buy_signal()

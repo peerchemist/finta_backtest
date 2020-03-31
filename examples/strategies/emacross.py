@@ -17,10 +17,14 @@ class EMACross(Strategy):
     def name(self):
         return f"EMACross ({self.period, self.period_slow})"
 
-    def signal(self):
+    def buy_signal(self):
 
         ma_fast = TA.EMA(self.ohlc, self.period)
         ma_slow = TA.EMA(self.ohlc, self.period_slow)
         signal = ma_fast > ma_slow
 
         return signal
+
+    def sell_signal(self):
+
+        return -self.buy_signal()

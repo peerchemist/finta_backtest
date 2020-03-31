@@ -18,10 +18,14 @@ class VolEMA(Strategy):
     def name(self):
         return f"volema{self.periods}"
 
-    def signal(self):
+    def buy_signal(self):
 
         vol = pd.Series(TA.EMA(self.ohlc, self.periods, column="volume"), name="vol")
 
         signal = vol > vol.shift()
 
         return signal
+
+    def sell_signal(self):
+
+        return -self.buy_signal()
