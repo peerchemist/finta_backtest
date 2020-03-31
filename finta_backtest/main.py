@@ -26,7 +26,7 @@ class Strategy(metaclass=ABCMeta):
         }
 
         return self.ohlc.resample(interval).agg(d)
-
+        return resample(ohlc, interval)
     @abstractmethod
     def signal(self) -> DataFrame:
         """What is the buy signal?"""
