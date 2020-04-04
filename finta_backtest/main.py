@@ -33,18 +33,23 @@ class Strategy(metaclass=ABCMeta):
         # return -self.buy_signal()
         pass
 
+    @property
     def candle_close(self) -> DataFrame:
         return self.ohlc.close
 
+    @property
     def candle_open(self) -> DataFrame:
         return self.ohlc.open
 
+    @property
     def candle_high(self) -> DataFrame:
         return self.ohlc.high
 
+    @property
     def candle_low(self) -> DataFrame:
         return self.ohlc.low
 
+    @property
     def candle_volume(self) -> DataFrame:
         return self.ohlc.volume
 
